@@ -36,16 +36,22 @@ RSpec.describe NASA::Commander do
   end
 
   describe "#report" do
-    before do
-      subject.execute("5 5")
-      subject.execute("1 2 N")
-      subject.execute("LMLMLMLMM")
-      subject.execute("3 3 E")
-      subject.execute("MMRMMRMRRM")
+    it "throws when no rovers deployed" do
+      expect{ subject.report }.to raise_error(/No rovers were deployed/)
     end
 
-    it "reports rovers positions" do
-      expect(subject.report).to eq(["1 3 N", "5 1 E"].join("\n"))
+    context "given valid commands" do
+      before do
+        subject.execute("5 5")
+        subject.execute("1 2 N")
+        subject.execute("LMLMLMLMM")
+        subject.execute("3 3 E")
+        subject.execute("MMRMMRMRRM")
+      end
+
+      it "reports rovers positions" do
+        expect(subject.report).to eq(["1 3 N", "5 1 E"].join("\n"))
+      end
     end
   end
 end
