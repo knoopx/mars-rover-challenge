@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path("../../lib", __FILE__)
+
+require 'nasa/commander'
+
+commander = NASA::Commander.new
+
+STDIN.each_line do |command|
+  begin
+    commander.execute(command.strip)
+  rescue => e
+    puts e.message
+    exit -1
+  end
+end
+
+puts commander.report
+exit 0
