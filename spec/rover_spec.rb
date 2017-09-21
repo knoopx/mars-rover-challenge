@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'nasa/rover'
 
 RSpec.describe NASA::Rover do

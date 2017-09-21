@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'nasa/commander'
 
 RSpec.describe NASA::Commander do
