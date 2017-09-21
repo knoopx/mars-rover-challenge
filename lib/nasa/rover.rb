@@ -5,6 +5,7 @@ module NASA
     attr_reader :x, :y, :orientation
 
     def initialize(x, y, orientation)
+      raise "Invalid orientation: `#{orientation}`" unless ORIENTATIONS.include?(orientation)
       @x, @y, @orientation = x, y, orientation
     end
 

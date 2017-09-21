@@ -2,9 +2,13 @@ require 'spec_helper'
 require 'nasa/rover'
 
 RSpec.describe NASA::Rover do
-  subject { NASA::Rover.new(0,0, "N") }
+  it "throws when initialized with an invalid orientation" do
+    expect { NASA::Rover.new(0,0, "X") }.to raise_error(/Invalid orientation/)
+  end
 
   describe "#turn_left!" do
+    subject { NASA::Rover.new(0,0, "N") }
+
     it "turns orientation accordingly" do
       expect(subject.orientation).to eq("N")
       subject.turn_left!
@@ -19,6 +23,8 @@ RSpec.describe NASA::Rover do
   end
 
   describe "#turn_right!" do
+    subject { NASA::Rover.new(0,0, "N") }
+
     it "turns orientation accordingly" do
       expect(subject.orientation).to eq("N")
       subject.turn_right!
@@ -33,6 +39,8 @@ RSpec.describe NASA::Rover do
   end
 
   describe "#advance!" do
+    subject { NASA::Rover.new(0,0, "N") }
+
     it "increments/decrements x and y accordingly" do
       subject.advance!
       expect(subject.x).to eq(0)
