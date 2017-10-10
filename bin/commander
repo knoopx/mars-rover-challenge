@@ -2,13 +2,15 @@
 
 $:.push File.expand_path("../../lib", __FILE__)
 
+require 'nasa/parser/text_parser'
 require 'nasa/commander'
 
 commander = NASA::Commander.new
+parser = NASA::Parser::TextParser.new
 
 STDIN.each_line do |command|
   begin
-    commander.execute(command.strip)
+    commander.execute(parser.parse_command(command.strip))
   rescue => e
     puts e.message
     exit -1

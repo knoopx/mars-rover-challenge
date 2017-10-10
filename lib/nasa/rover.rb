@@ -4,21 +4,15 @@ module NASA
 
     attr_reader :x, :y, :orientation
 
-    def initialize(x, y, orientation)
+    def initialize(plateau, x, y, orientation)
       raise "Invalid orientation: `#{orientation}`" unless ORIENTATIONS.include?(orientation)
-      @x, @y, @orientation = x, y, orientation
+      @plateau, @x, @y, @orientation = plateau, x, y, orientation
     end
 
     def advance!
-      case @orientation
-        when "N"
-          @y += 1
-        when "S"
-          @y -= 1
-        when "E"
-          @x += 1
-        when "W"
-          @x -= 1
+      x, y = next_position(@orientation)
+      if @plateau.valid_position?(x, y)
+        @x, @y = x, y
       end
     end
 
@@ -31,6 +25,21 @@ module NASA
     end
 
     private
+
+    def next_position(orientation)
+      x, y = @x, @y
+      case orientation
+        when "N"
+          y += 1
+        when "S"
+          y -= 1
+        when "E"
+          x += 1
+        when "W"
+          x -= 1
+      end
+      [x, y]
+    end
 
     def turn!(offset)
       index = ORIENTATIONS.index(@orientation) + offset

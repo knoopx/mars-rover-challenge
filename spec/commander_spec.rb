@@ -2,55 +2,59 @@ require 'spec_helper'
 require 'nasa/commander'
 
 RSpec.describe NASA::Commander do
-  context "initialization" do
-    it "throws on unexpected input" do
-      expect{ subject.execute("abc") }.to raise_error(/Unexpected command/)
+  describe "#execute" do
+    context "initialization" do
+      it "initializes the plateau" do
+        subject.execute(NASA::Command::InitializeCommand.new(5, 5))
+        expect(subject.plateau.width).to eq(5)
+        expect(subject.plateau.height).to eq(5)
+      end
     end
 
-    it "initializes the plateau" do
-      subject.execute("5 5")
-      expect(subject.width).to eq(5)
-      expect(subject.height).to eq(5)
-    end
-  end
+    context "deployment" do
+      before { subject.execute(NASA::Command::InitializeCommand.new(5, 5)) }
 
-  context "deployment" do
-    before { subject.execute("5 5") }
-
-    it "throws on unexpected input" do
-      expect{ subject.execute("6 6 X") }.to raise_error(/Unexpected command/)
-    end
-
-    it "deploys rovers" do
-      subject.execute("1 2 N")
-      expect(subject.rovers.size).to eq(1)
-      expect(subject.rovers.first.x).to eq(1)
-      expect(subject.rovers.first.y).to eq(2)
-      expect(subject.rovers.first.orientation).to eq("N")
-      subject.execute("LMLMLMLMM")
-      expect(subject.rovers.size).to eq(1)
-      expect(subject.rovers.first.x).to eq(1)
-      expect(subject.rovers.first.y).to eq(3)
-      expect(subject.rovers.first.orientation).to eq("N")
+      it "deploys rovers" do
+        subject.execute(NASA::Command::DeployCommand.new(1, 2, "N"))
+        expect(subject.last_deployed_rover).not_to be_nil
+        expect(subject.plateau.rovers.size).to eq(1)
+        expect(subject.plateau.rovers.first.x).to eq(1)
+        expect(subject.plateau.rovers.first.y).to eq(2)
+        expect(subject.plateau.rovers.first.orientation).to eq("N")
+        subject.execute(NASA::Command::InstructCommand.new(["L", "M", "L", "M", "L", "M", "L", "M", "M"]))
+        expect(subject.plateau.rovers.size).to eq(1)
+        expect(subject.plateau.rovers.first.x).to eq(1)
+        expect(subject.plateau.rovers.first.y).to eq(3)
+        expect(subject.plateau.rovers.first.orientation).to eq("N")
+      end
     end
   end
 
   describe "#report" do
     it "throws when no rovers deployed" do
-      expect{ subject.report }.to raise_error(/No rovers were deployed/)
+      expect{ subject.report }.to raise_error(/Plateau not initialized/)
     end
 
-    context "given valid commands" do
-      before do
-        subject.execute("5 5")
-        subject.execute("1 2 N")
-        subject.execute("LMLMLMLMM")
-        subject.execute("3 3 E")
-        subject.execute("MMRMMRMRRM")
+    context do
+      before { subject.initialize_plateau(5, 5)}
+
+      it "throws when no rovers deployed" do
+        expect{ subject.report }.to raise_error(/No rovers were deployed/)
       end
 
-      it "reports rovers positions" do
-        expect(subject.report).to eq(["1 3 N", "5 1 E"].join("\n"))
+      context do
+        before do
+          subject.execute(
+            NASA::Command::DeployCommand.new(1, 2, "N"),
+            NASA::Command::InstructCommand.new(["L", "M", "L", "M", "L", "M", "L", "M", "M"]),
+            NASA::Command::DeployCommand.new(3, 3, "E"),
+            NASA::Command::InstructCommand.new(["M", "M", "R", "M", "M", "R", "M", "R", "R", "M"]),
+          )
+        end
+
+        it "reports rovers positions" do
+          expect(subject.report).to eq(["1 3 N", "5 1 E"].join("\n"))
+        end
       end
     end
   end
